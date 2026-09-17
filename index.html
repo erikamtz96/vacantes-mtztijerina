@@ -160,6 +160,9 @@
     background:#EEEFFA;border-radius:7px;padding:3px 7px;white-space:nowrap;
   }
   .suc-badge.matriz{background:#FFF1E0;color:#B3121A;}
+  .suc-cubierta{opacity:.5;}
+  .suc-cubierta .suc-top{cursor:not-allowed;}
+  .suc-badge.cubierta{background:#EFEFEF;color:#8A8A8A;}
   .suc-dir-btn{
     background:none;border:none;color:var(--azul);
     font-size:12px;font-weight:700;text-decoration:underline;
@@ -213,6 +216,14 @@
     font-size:13px;color:var(--azul-oscuro);margin-bottom:16px;
   }
   .recordatorio-docs b{color:var(--azul);}
+
+  /* AVISO MITRAS */
+  .aviso-mitras{
+    display:flex;gap:10px;align-items:flex-start;
+    background:#FFF1E0;border-radius:12px;
+    padding:12px 16px;margin:14px 20px 0;
+    font-size:13px;color:#8A4B00;font-weight:600;
+  }
 
   /* FORM */
   form{padding:8px 20px 0;}
@@ -428,11 +439,24 @@
         </div>
         <div class="desc">Reparto y logística entre sucursales · 4 vacantes disponibles.</div>
       </label>
+      <label class="tag" id="tag-admin">
+        <input type="radio" name="vacante" value="Puesto Administrativo">
+        <div class="tag-top">
+          <span class="puesto">Puesto Administrativo</span>
+          <span class="precio">SEGÚN PUESTO</span>
+        </div>
+        <div class="desc">Requiere licenciatura terminada · Disponible en nuestras oficinas corporativas (Mitras).</div>
+      </label>
+    </div>
+
+    <div class="aviso-mitras">
+      <span>📍</span>
+      <span>Todas las entrevistas se realizan en nuestras oficinas de Mitras (sede matriz).</span>
     </div>
 
     <div class="vacantes" style="padding-top:6px;">
       <p class="section-title" id="sucursal-title">Elige tu sucursal</p>
-      <p class="hint" id="sucursal-subtitle" style="margin:-6px 0 12px 4px;">3 vacantes de ayudante disponibles en cada sucursal.</p>
+      <p class="hint" id="sucursal-subtitle" style="margin:-6px 0 12px 4px;">Por ahora solo hay vacantes en las sucursales marcadas como disponibles.</p>
       <div id="sucursales-list"></div>
       <div class="campo" id="chofer-nota" style="display:none;background:#EAF1F4;border-radius:12px;padding:12px 14px;margin-top:4px;">
         <span style="font-size:13px;color:var(--azul-oscuro);">Los choferes reparten entre todas las sucursales, así que no necesitas elegir una en particular — tu entrevista sigue siendo en Mitras.</span>
@@ -449,6 +473,8 @@
           <li>Prestaciones de ley</li>
           <li>Horario de trabajo: 10:00 a 18:00 hrs</li>
           <li>1 día de descanso entre semana</li>
+          <li>Turnos disponibles de 4, 6 y 8 horas</li>
+          <li>¿Tienes dudas? Pregúntanos por WhatsApp</li>
         </ul>
       </div>
     </div>
@@ -664,40 +690,60 @@ document.querySelectorAll('.tag').forEach(tag=>{
     document.querySelectorAll('.tag').forEach(t=>t.classList.remove('selected'));
     tag.classList.add('selected');
     tag.querySelector('input').checked = true;
-    actualizarModoChofer(tag.querySelector('input').value === 'Chofer');
+    actualizarModoVacante(tag.querySelector('input').value);
   });
 });
 
-function actualizarModoChofer(esChofer){
-  document.getElementById('sucursales-list').style.display = esChofer ? 'none' : 'block';
-  document.getElementById('sucursal-subtitle').style.display = esChofer ? 'none' : 'block';
-  document.getElementById('sucursal-title').textContent = esChofer ? 'Sucursal' : 'Elige tu sucursal';
-  document.getElementById('chofer-nota').style.display = esChofer ? 'block' : 'none';
-  if(esChofer){
-    sucursalSeleccionada = 'Todas las sucursales (reparto)';
+const SUCURSAL_FIJA = {
+  'Chofer': 'Todas las sucursales (reparto)',
+  'Puesto Administrativo': 'Mitras'
+};
+const NOTA_VACANTE = {
+  'Chofer': 'Los choferes reparten entre todas las sucursales, así que no necesitas elegir una en particular — tu entrevista sigue siendo en Mitras.',
+  'Puesto Administrativo': 'Este puesto es en nuestras oficinas corporativas, en Mitras — no necesitas elegir sucursal.'
+};
+
+function actualizarModoVacante(vacante){
+  const fija = SUCURSAL_FIJA[vacante];
+  const notaBox = document.getElementById('chofer-nota');
+  document.getElementById('sucursales-list').style.display = fija ? 'none' : 'block';
+  document.getElementById('sucursal-subtitle').style.display = fija ? 'none' : 'block';
+  document.getElementById('sucursal-title').textContent = fija ? 'Sucursal' : 'Elige tu sucursal';
+  notaBox.style.display = fija ? 'block' : 'none';
+  if(fija){
+    notaBox.querySelector('span').textContent = NOTA_VACANTE[vacante];
+    sucursalSeleccionada = fija;
     document.querySelectorAll('.suc-card').forEach(c=>c.classList.remove('selected'));
-  } else if(sucursalSeleccionada === 'Todas las sucursales (reparto)'){
+  } else if(Object.values(SUCURSAL_FIJA).includes(sucursalSeleccionada)){
     sucursalSeleccionada = '';
   }
 }
 
 // --- Sucursales ---
 const SUCURSALES = ["San Jerónimo","Anáhuac","Lindavista","Brisas","Misiones","Valle de Cumbres","Escobedo Plaza Nía","Cumbres","Forum Cumbres","Cumbres Elite","Contry Plaza Loreto","Escobedo Citadina","Puentes","Gómez Morín","Roma","La Fama","La Rioja","San Pedro","Mitras"];
+// Sucursales con vacantes abiertas ahora mismo. Las demás se muestran como "cubiertas".
+// Para reabrir una sucursal, solo agrégala aquí de nuevo.
+const SUCURSALES_ACTIVAS = ["La Fama","Mitras","San Pedro","La Rioja","Escobedo Citadina","Escobedo Plaza Nía"];
 let sucursalSeleccionada = '';
 
 function renderSucursales(){
   const cont = document.getElementById('sucursales-list');
   cont.innerHTML = SUCURSALES.map((nombre, i)=>{
     const esMitras = nombre === 'Mitras';
+    const activa = SUCURSALES_ACTIVAS.includes(nombre);
     const mapsQuery = encodeURIComponent(`Pescadería Martínez Tijerina ${nombre} Monterrey`);
+    let badge;
+    if(!activa) badge = '<span class="suc-badge cubierta">Vacantes cubiertas</span>';
+    else if(esMitras) badge = '<span class="suc-badge matriz">Sede matriz</span>';
+    else badge = '<span class="suc-badge">3 vacantes</span>';
     return `
-    <div class="suc-card" data-idx="${i}">
-      <div class="suc-top" data-select="${i}">
+    <div class="suc-card ${activa ? '' : 'suc-cubierta'}" data-idx="${i}">
+      <div class="suc-top" data-select="${activa ? i : ''}">
         <div class="suc-left">
           <div class="suc-radio"></div>
           <span class="suc-nombre">${nombre}</span>
         </div>
-        <span class="suc-badge ${esMitras ? 'matriz':''}">${esMitras ? 'Sede matriz' : '3 vacantes'}</span>
+        ${badge}
       </div>
       <button type="button" class="suc-dir-btn" data-toggle="${i}">Ver dirección</button>
       <div class="suc-dir-panel" data-panel="${i}">
@@ -706,7 +752,7 @@ function renderSucursales(){
     </div>`;
   }).join('');
 
-  cont.querySelectorAll('[data-select]').forEach(el=>{
+  cont.querySelectorAll('[data-select]:not([data-select=""])').forEach(el=>{
     el.addEventListener('click', ()=>{
       const idx = el.getAttribute('data-select');
       sucursalSeleccionada = SUCURSALES[idx];
@@ -805,7 +851,7 @@ document.getElementById('btn-otro').addEventListener('click', async ()=>{
   document.querySelectorAll('.suc-card').forEach(c=>c.classList.remove('selected'));
   document.querySelectorAll('.suc-dir-panel').forEach(p=>p.classList.remove('open'));
   document.querySelectorAll('.suc-dir-btn').forEach(b=>b.textContent='Ver dirección');
-  actualizarModoChofer(false);
+  actualizarModoVacante('');
   document.querySelectorAll('.tag').forEach(t=>t.classList.remove('selected'));
   diaSeleccionado = null;
   horaSeleccionada = null;
