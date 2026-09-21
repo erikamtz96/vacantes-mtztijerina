@@ -451,7 +451,7 @@
 
     <div class="aviso-mitras">
       <span>📍</span>
-      <span>Todas las entrevistas se realizan en nuestras oficinas de Mitras (sede matriz).</span>
+      <span>Todas las entrevistas se realizan en nuestras oficinas de Mitras (sede matriz). Si no puedes acudir ahí, comunícate directo por <a href="https://wa.me/528128701180?text=Hola%2C%20no%20puedo%20acudir%20a%20Mitras%20para%20mi%20entrevista%2C%20%C2%BFme%20pueden%20ayudar%3F" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">WhatsApp</a>.</span>
     </div>
 
     <div class="vacantes" style="padding-top:6px;">
@@ -479,7 +479,7 @@
       </div>
     </div>
 
-    <div class="vacantes" style="padding-top:14px;">
+    <div class="vacantes" style="padding-top:14px;" id="dias-section">
       <p class="section-title">Elige el día de tu entrevista</p>
       <div id="dias-list" class="dias-row"></div>
     </div>
@@ -514,6 +514,14 @@
 
       <button type="submit" class="cta" id="btn-registrar">Registrarme y agendar mi entrevista</button>
     </form>
+
+    <div class="vacantes" id="admin-whatsapp-panel" style="display:none;padding-top:14px;">
+      <div class="recordatorio-docs" style="background:#EAF1F4;">
+        <span>💼</span>
+        <div><b>Puesto Administrativo</b><br>Para este puesto no te registras aquí — escríbenos directo por WhatsApp y con gusto te damos toda la información.</div>
+      </div>
+      <a class="wa-btn" id="wa-link-admin" href="#" target="_blank" rel="noopener">💬 Escribir por WhatsApp</a>
+    </div>
   </div>
 
   <!-- PANTALLA 2: TICKET DE CONFIRMACION -->
@@ -702,20 +710,32 @@ const NOTA_VACANTE = {
   'Chofer': 'Los choferes reparten entre todas las sucursales, así que no necesitas elegir una en particular — tu entrevista sigue siendo en Mitras.',
   'Puesto Administrativo': 'Este puesto es en nuestras oficinas corporativas, en Mitras — no necesitas elegir sucursal.'
 };
+const WHATSAPP_ADMIN = '528114850169';
 
 function actualizarModoVacante(vacante){
+  const esAdmin = vacante === 'Puesto Administrativo';
   const fija = SUCURSAL_FIJA[vacante];
   const notaBox = document.getElementById('chofer-nota');
   document.getElementById('sucursales-list').style.display = fija ? 'none' : 'block';
   document.getElementById('sucursal-subtitle').style.display = fija ? 'none' : 'block';
   document.getElementById('sucursal-title').textContent = fija ? 'Sucursal' : 'Elige tu sucursal';
-  notaBox.style.display = fija ? 'block' : 'none';
+  notaBox.style.display = (fija && !esAdmin) ? 'block' : 'none';
   if(fija){
-    notaBox.querySelector('span').textContent = NOTA_VACANTE[vacante];
+    if(!esAdmin) notaBox.querySelector('span').textContent = NOTA_VACANTE[vacante];
     sucursalSeleccionada = fija;
     document.querySelectorAll('.suc-card').forEach(c=>c.classList.remove('selected'));
   } else if(Object.values(SUCURSAL_FIJA).includes(sucursalSeleccionada)){
     sucursalSeleccionada = '';
+  }
+
+  // Puesto Administrativo: no se agenda aquí, se desvía a WhatsApp
+  document.getElementById('dias-section').style.display = esAdmin ? 'none' : 'block';
+  document.getElementById('horarios-wrap').style.display = esAdmin ? 'none' : 'block';
+  document.getElementById('form-registro').style.display = esAdmin ? 'none' : 'block';
+  document.getElementById('admin-whatsapp-panel').style.display = esAdmin ? 'block' : 'none';
+  if(esAdmin){
+    const msg = encodeURIComponent('Hola, me interesa el puesto administrativo en Martínez Tijerina. ¿Me pueden dar más información?');
+    document.getElementById('wa-link-admin').href = `https://wa.me/${WHATSAPP_ADMIN}?text=${msg}`;
   }
 }
 
