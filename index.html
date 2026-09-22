@@ -431,6 +431,14 @@
         </div>
         <div class="desc">Acomodo, limpieza y apoyo general en la pescadería.</div>
       </label>
+      <label class="tag" id="tag-cocina">
+        <input type="radio" name="vacante" value="Auxiliar de Cocina">
+        <div class="tag-top">
+          <span class="puesto">Auxiliar de Cocina</span>
+          <span class="precio">$2,438 / SEMANA</span>
+        </div>
+        <div class="desc">Disponible en Mitras (sede matriz).</div>
+      </label>
       <label class="tag" id="tag-chofer">
         <input type="radio" name="vacante" value="Chofer">
         <div class="tag-top">
@@ -445,7 +453,7 @@
           <span class="puesto">Puesto Administrativo</span>
           <span class="precio">SEGÚN PUESTO</span>
         </div>
-        <div class="desc">Requiere licenciatura terminada · Disponible en nuestras oficinas corporativas (Mitras).</div>
+        <div class="desc">Auxiliar Contable, Contadora · Requiere licenciatura terminada · Disponible en nuestras oficinas corporativas (Mitras).</div>
       </label>
     </div>
 
@@ -704,11 +712,13 @@ document.querySelectorAll('.tag').forEach(tag=>{
 
 const SUCURSAL_FIJA = {
   'Chofer': 'Todas las sucursales (reparto)',
-  'Puesto Administrativo': 'Mitras'
+  'Puesto Administrativo': 'Mitras',
+  'Auxiliar de Cocina': 'Mitras'
 };
 const NOTA_VACANTE = {
   'Chofer': 'Los choferes reparten entre todas las sucursales, así que no necesitas elegir una en particular — tu entrevista sigue siendo en Mitras.',
-  'Puesto Administrativo': 'Este puesto es en nuestras oficinas corporativas, en Mitras — no necesitas elegir sucursal.'
+  'Puesto Administrativo': 'Este puesto es en nuestras oficinas corporativas, en Mitras — no necesitas elegir sucursal.',
+  'Auxiliar de Cocina': 'Esta vacante está disponible en Mitras (sede matriz) — no necesitas elegir sucursal.'
 };
 const WHATSAPP_ADMIN = '528114850169';
 
